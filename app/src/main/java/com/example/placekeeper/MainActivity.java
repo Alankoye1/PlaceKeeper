@@ -23,10 +23,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPlaceClickListener {
 
-    private RecyclerView recyclerView;
     private PlaceAdapter adapter;
     private TextView textEmpty;
-    private FloatingActionButton fabAdd;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -47,9 +45,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        recyclerView = findViewById(R.id.recycler_places);
+        RecyclerView recyclerView = findViewById(R.id.recycler_places);
         textEmpty = findViewById(R.id.text_empty);
-        fabAdd = findViewById(R.id.fab_add);
+        FloatingActionButton fabAdd = findViewById(R.id.fab_add);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PlaceAdapter(this);

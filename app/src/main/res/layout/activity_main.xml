@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="No places saved yet.\nTap + to add one!"
+        android:text="@string/no_places_saved_yet_ntap_to_add_one"
         android:textAlignment="center"
         android:visibility="gone" />
 
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="Add Place"
+        android:contentDescription="@string/add_place"
         app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -15,7 +15,7 @@ import java.util.Locale;
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> {
 
     private List<Place> places = new ArrayList<>();
-    private OnPlaceClickListener listener;
+    final private OnPlaceClickListener listener;
 
     public interface OnPlaceClickListener {
         void onDeleteClick(Place place);
@@ -49,8 +49,11 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     }
 
     static class PlaceViewHolder extends RecyclerView.ViewHolder {
-        TextView textName, textNote, textCoordinates, textDate;
-        Button buttonDelete;
+        final TextView textName;
+        final TextView textNote;
+        final TextView textCoordinates;
+        final TextView textDate;
+        final Button buttonDelete;
 
         public PlaceViewHolder(@NonNull View itemView) {
             super(itemView);

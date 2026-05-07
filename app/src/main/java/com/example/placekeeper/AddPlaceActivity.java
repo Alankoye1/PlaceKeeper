@@ -9,10 +9,12 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Objects;
+
 public class AddPlaceActivity extends AppCompatActivity {
 
     private TextInputEditText editName, editNote, editLat, editLng;
-    private Button buttonSave, buttonCancel;
+    private Button buttonSave;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -29,17 +31,17 @@ public class AddPlaceActivity extends AppCompatActivity {
         editLat = findViewById(R.id.edit_latitude);
         editLng = findViewById(R.id.edit_longitude);
         buttonSave = findViewById(R.id.button_save);
-        buttonCancel = findViewById(R.id.button_cancel);
+        Button buttonCancel = findViewById(R.id.button_cancel);
 
         buttonSave.setOnClickListener(v -> savePlace());
         buttonCancel.setOnClickListener(v -> finish());
     }
 
     private void savePlace() {
-        String name = editName.getText().toString().trim();
-        String note = editNote.getText().toString().trim();
-        String latStr = editLat.getText().toString().trim();
-        String lngStr = editLng.getText().toString().trim();
+        String name = Objects.requireNonNull(editName.getText()).toString().trim();
+        String note = Objects.requireNonNull(editNote.getText()).toString().trim();
+        String latStr = Objects.requireNonNull(editLat.getText()).toString().trim();
+        String lngStr = Objects.requireNonNull(editLng.getText()).toString().trim();
 
         if (TextUtils.isEmpty(name)) {
             editName.setError("Name is required");

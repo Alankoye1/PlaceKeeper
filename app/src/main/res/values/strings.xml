@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">PlaceKeeper</string>
+    <string name="add_new_place">Add New Place</string>
+    <string name="place_name">Place Name *</string>
+    <string name="note_optional">Note (optional)</string>
+    <string name="latitude">Latitude *</string>
+    <string name="longitude">Longitude *</string>
+    <string name="cancel">Cancel</string>
+    <string name="save_place">Save Place</string>
+    <string name="placekeeper">PlaceKeeper</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
+    <string name="login">Login</string>
+    <string name="no_places_saved_yet_ntap_to_add_one">No places saved yet.\nTap + to add one!</string>
+    <string name="add_place">Add Place</string>
+    <string name="create_account">Create Account</string>
 </resources>

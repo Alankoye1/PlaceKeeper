@@ -10,11 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Objects;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private TextInputEditText editEmail, editPassword;
     private Button buttonRegister;
-    private TextView textLogin;
     private FirebaseAuth mAuth;
 
     @Override
@@ -27,15 +28,15 @@ public class RegisterActivity extends AppCompatActivity {
         editEmail = findViewById(R.id.edit_email);
         editPassword = findViewById(R.id.edit_password);
         buttonRegister = findViewById(R.id.button_register);
-        textLogin = findViewById(R.id.text_login);
+        TextView textLogin = findViewById(R.id.text_login);
 
         buttonRegister.setOnClickListener(v -> registerUser());
         textLogin.setOnClickListener(v -> finish());
     }
 
     private void registerUser() {
-        String email = editEmail.getText().toString().trim();
-        String password = editPassword.getText().toString().trim();
+        String email = Objects.requireNonNull(editEmail.getText()).toString().trim();
+        String password = Objects.requireNonNull(editPassword.getText()).toString().trim();
 
         if (TextUtils.isEmpty(email)) {
             editEmail.setError("Email is required");
@@ -60,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
                         startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                         finish();
                     } else {
-                        Toast.makeText(RegisterActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "Registration failed: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                         buttonRegister.setEnabled(true);
                     }
                 });

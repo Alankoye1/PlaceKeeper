@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add New Place"
+            android:text="@string/add_new_place"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
@@ -26,7 +26,8 @@
                 android:id="@+id/edit_place_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Place Name *"/>
+                android:hint="@string/place_name"
+                android:textColorHint="#546E7A" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -38,7 +39,7 @@
                 android:id="@+id/edit_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Note (optional)"
+                android:hint="@string/note_optional"
                 android:inputType="textMultiLine"
                 android:minLines="2"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -46,6 +47,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:layout_marginBottom="16dp">
 
@@ -59,8 +61,9 @@
                     android:id="@+id/edit_latitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Latitude *"
-                    android:inputType="numberDecimal|numberSigned"/>
+                    android:hint="@string/latitude"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:textColorHint="#546E7A" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -73,7 +76,7 @@
                     android:id="@+id/edit_longitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Longitude *"
+                    android:hint="@string/longitude"
                     android:inputType="numberDecimal|numberSigned"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -82,7 +85,7 @@
             android:id="@+id/button_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save Place"
+            android:text="@string/save_place"
             android:layout_marginTop="16dp"
             android:padding="12dp"/>
 
@@ -91,7 +94,7 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cancel"/>
+            android:text="@string/cancel"/>
 
     </LinearLayout>
 </ScrollView>
