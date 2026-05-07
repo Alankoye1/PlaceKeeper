@@ -2,6 +2,7 @@ package com.example.placekeeper;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.ServerTimestamp;
+import java.util.List;
 
 public class Place {
     private String id;
@@ -9,6 +10,8 @@ public class Place {
     private String note;
     private double latitude;
     private double longitude;
+    private List<String> tags;
+    private String imageUrl;
     @ServerTimestamp
     private Timestamp createdAt;
 
@@ -37,6 +40,12 @@ public class Place {
 
     public double getLongitude() { return longitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
+
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }

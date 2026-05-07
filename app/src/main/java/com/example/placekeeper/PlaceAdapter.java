@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     public interface OnPlaceClickListener {
         void onDeleteClick(Place place);
         void onEditClick(Place place);
+        void onPlaceClick(Place place);
     }
 
     public PlaceAdapter(OnPlaceClickListener listener) {
@@ -73,6 +76,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         final TextView textDate;
         final Button buttonDelete;
         final Button buttonEdit;
+        final ChipGroup chipGroupTags;
 
         public PlaceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -82,6 +86,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             textDate = itemView.findViewById(R.id.text_place_date);
             buttonDelete = itemView.findViewById(R.id.button_delete);
             buttonEdit = itemView.findViewById(R.id.button_edit);
+            chipGroupTags = itemView.findViewById(R.id.chip_group_tags);
         }
 
         public void bind(final Place place, final OnPlaceClickListener listener) {
@@ -96,6 +101,17 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                 textDate.setText("Added: Just now");
             }
 
+            chipGroupTags.removeAllViews();
+            if (place.getTags() != null) {
+                for (String tag : place.getTags()) {
+                    Chip chip = new Chip(itemView.getContext());
+                    chip.setText(tag);
+                    chip.setCheckable(false);
+                    chip.setClickable(false);
+                    chipGroupTags.addView(chip);
+                }
+            }
+
             buttonDelete.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDeleteClick(place);
@@ -105,6 +121,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             buttonEdit.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onEditClick(place);
+                }
+            });
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPlaceClick(place);
                 }
             });
         }

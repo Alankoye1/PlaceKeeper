@@ -39,4 +39,14 @@
 
     <!-- Errors & Messages -->
     <string name="error_location_permission">Location permission is required to use this feature.</string>
+    <string name="label_tags">Tags</string>
+    <string name="hint_add_tag">Add a tag and press Enter</string>
+    <string name="label_photo">Photo</string>
+    <string name="btn_add_photo">Add Photo</string>
+    <string name="msg_photo_uploading">Uploading photo...</string>
+    <string name="msg_photo_uploaded">Photo uploaded successfully</string>
+    <string name="msg_photo_error">Error uploading photo</string>
+    <string name="title_place_details">Place Details</string>
+    <string name="btn_share">Share Place</string>
+    <string name="btn_export">Export Data</string>
 </resources>

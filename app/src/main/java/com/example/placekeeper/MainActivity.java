@@ -1,6 +1,7 @@
 package com.example.placekeeper;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -19,6 +21,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
     private TextView textEmpty;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private List<Place> allPlacesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,17 +77,17 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
                         return;
                     }
 
-                    List<Place> places = new ArrayList<>();
+                    allPlacesList.clear();
                     if (value != null) {
                         for (QueryDocumentSnapshot doc : value) {
                             Place place = doc.toObject(Place.class);
                             place.setId(doc.getId());
-                            places.add(place);
+                            allPlacesList.add(place);
                         }
                     }
 
-                    adapter.setPlaces(places);
-                    textEmpty.setVisibility(places.isEmpty() ? View.VISIBLE : View.GONE);
+                    adapter.setPlaces(allPlacesList);
+                    textEmpty.setVisibility(allPlacesList.isEmpty() ? View.VISIBLE : View.GONE);
                 });
     }
 
@@ -115,6 +121,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
     }
 
     @Override
+    public void onPlaceClick(Place place) {
+        Intent intent = new Intent(this, PlaceDetailsActivity.class);
+        intent.putExtra("place_id", place.getId());
+        startActivity(intent);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
@@ -135,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
                 }
             });
         }
+        
+        menu.add(Menu.NONE, 100, Menu.NONE, R.string.btn_export);
         return true;
     }
 
@@ -149,7 +164,53 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
         } else if (id == R.id.action_map) {
             startActivity(new Intent(MainActivity.this, MapActivity.class));
             return true;
+        } else if (id == 100) {
+            exportToCSV();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void exportToCSV() {
+        if (allPlacesList.isEmpty()) {
+            Toast.makeText(this, "No data to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        StringBuilder csvData = new StringBuilder();
+        csvData.append("Name,Note,Latitude,Longitude,Tags\n");
+        for (Place p : allPlacesList) {
+            String tagsStr = p.getTags() != null ? String.join(";", p.getTags()) : "";
+            csvData.append(escapeCsv(p.getPlaceName())).append(",")
+                    .append(escapeCsv(p.getNote())).append(",")
+                    .append(p.getLatitude()).append(",")
+                    .append(p.getLongitude()).append(",")
+                    .append(escapeCsv(tagsStr)).append("\n");
+        }
+
+        try {
+            File exportDir = new File(getCacheDir(), "exports");
+            if (!exportDir.exists()) exportDir.mkdirs();
+            File file = new File(exportDir, "places_export.csv");
+            FileOutputStream out = new FileOutputStream(file);
+            out.write(csvData.toString().getBytes());
+            out.close();
+
+            Uri contentUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/csv");
+            intent.putExtra(Intent.EXTRA_SUBJECT, "PlaceKeeper Export");
+            intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(intent, "Export via"));
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String escapeCsv(String text) {
+        if (text == null) return "";
+        return "\"" + text.replace("\"", "\"\"") + "\"";
     }
 }

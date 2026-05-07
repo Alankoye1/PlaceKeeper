@@ -3,35 +3,62 @@ package com.example.placekeeper;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 public class AddPlaceActivity extends AppCompatActivity {
 
     private static final int PICK_LOCATION_REQUEST = 1;
     private static final int LOCATION_PERMISSION_REQUEST = 2;
+    private static final int PICK_IMAGE_REQUEST = 3;
+    private static final int CAPTURE_IMAGE_REQUEST = 4;
 
-    private TextInputEditText editName, editNote, editLat, editLng;
-    private Button buttonSave;
-    private TextView textTitle;
+    private TextInputEditText editName, editNote, editLat, editLng, editAddTag;
+    private Button buttonSave, buttonAddPhoto;
+    private ImageView imagePreview;
+    private ChipGroup chipGroupTags;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private FirebaseStorage storage;
     private FusedLocationProviderClient fusedLocationClient;
-    private String placeId; // Used for editing
+    
+    private String placeId;
+    private List<String> tags = new ArrayList<>();
+    private Uri imageUri;
+    private String currentImageUrl;
+    private String currentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,19 +67,24 @@ public class AddPlaceActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        textTitle = findViewById(R.id.text_title);
+        TextView textTitle = findViewById(R.id.text_title);
         editName = findViewById(R.id.edit_place_name);
         editNote = findViewById(R.id.edit_note);
         editLat = findViewById(R.id.edit_latitude);
         editLng = findViewById(R.id.edit_longitude);
+        editAddTag = findViewById(R.id.edit_add_tag);
+        chipGroupTags = findViewById(R.id.chip_group_tags);
+        imagePreview = findViewById(R.id.image_preview);
+        buttonAddPhoto = findViewById(R.id.button_add_photo);
         buttonSave = findViewById(R.id.button_save);
         Button buttonCancel = findViewById(R.id.button_cancel);
         Button buttonCurrent = findViewById(R.id.button_current_location);
         Button buttonPick = findViewById(R.id.button_pick_map);
 
-        // Check for edit mode
+        // Edit Mode
         Intent intent = getIntent();
         if (intent.hasExtra("place_id")) {
             placeId = intent.getStringExtra("place_id");
@@ -61,12 +93,103 @@ public class AddPlaceActivity extends AppCompatActivity {
             editNote.setText(intent.getStringExtra("place_note"));
             editLat.setText(String.format(Locale.getDefault(), "%.6f", intent.getDoubleExtra("latitude", 0.0)));
             editLng.setText(String.format(Locale.getDefault(), "%.6f", intent.getDoubleExtra("longitude", 0.0)));
+            // Tags and Image would be loaded in a real app, but for Phase 3 we'll handle them if passed
+            // In a more robust version, we'd fetch the full Place object from Firestore
         }
 
         buttonSave.setOnClickListener(v -> savePlace());
         buttonCancel.setOnClickListener(v -> finish());
         buttonPick.setOnClickListener(v -> startActivityForResult(new Intent(AddPlaceActivity.this, LocationPickerActivity.class), PICK_LOCATION_REQUEST));
         buttonCurrent.setOnClickListener(v -> checkLocationPermission());
+        
+        buttonAddPhoto.setOnClickListener(v -> showImagePickerDialog());
+        
+        editAddTag.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                String tag = editAddTag.getText().toString().trim();
+                if (!TextUtils.isEmpty(tag)) {
+                    addTag(tag);
+                    editAddTag.setText("");
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void addTag(String tag) {
+        if (!tags.contains(tag)) {
+            tags.add(tag);
+            Chip chip = new Chip(this);
+            chip.setText(tag);
+            chip.setCloseIconVisible(true);
+            chip.setOnCloseIconClickListener(v -> {
+                chipGroupTags.removeView(chip);
+                tags.remove(tag);
+            });
+            chipGroupTags.addView(chip);
+        }
+    }
+
+    private void showImagePickerDialog() {
+        String[] options = {"Camera", "Gallery"};
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Select Image")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        dispatchTakePictureIntent();
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                    }
+                }).show();
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                Toast.makeText(this, "Error creating file", Toast.LENGTH_SHORT).show();
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
+                imageUri = photoURI;
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAPTURE_IMAGE_REQUEST);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PICK_LOCATION_REQUEST && data != null) {
+                double lat = data.getDoubleExtra("latitude", 0.0);
+                double lng = data.getDoubleExtra("longitude", 0.0);
+                editLat.setText(String.valueOf(lat));
+                editLng.setText(String.valueOf(lng));
+            } else if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+                imageUri = data.getData();
+                imagePreview.setImageURI(imageUri);
+                imagePreview.setVisibility(android.view.View.VISIBLE);
+            } else if (requestCode == CAPTURE_IMAGE_REQUEST) {
+                imagePreview.setImageURI(imageUri);
+                imagePreview.setVisibility(android.view.View.VISIBLE);
+            }
+        }
     }
 
     private void checkLocationPermission() {
@@ -103,17 +226,6 @@ public class AddPlaceActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_LOCATION_REQUEST && resultCode == RESULT_OK && data != null) {
-            double lat = data.getDoubleExtra("latitude", 0.0);
-            double lng = data.getDoubleExtra("longitude", 0.0);
-            editLat.setText(String.valueOf(lat));
-            editLng.setText(String.valueOf(lng));
-        }
-    }
-
     private void savePlace() {
         String name = Objects.requireNonNull(editName.getText()).toString().trim();
         String note = Objects.requireNonNull(editNote.getText()).toString().trim();
@@ -146,6 +258,28 @@ public class AddPlaceActivity extends AppCompatActivity {
 
         buttonSave.setEnabled(false);
 
+        if (imageUri != null) {
+            uploadImageAndSavePlace(name, note, latitude, longitude);
+        } else {
+            finalSavePlace(name, note, latitude, longitude, currentImageUrl);
+        }
+    }
+
+    private void uploadImageAndSavePlace(String name, String note, double latitude, double longitude) {
+        Toast.makeText(this, R.string.msg_photo_uploading, Toast.LENGTH_SHORT).show();
+        StorageReference ref = storage.getReference().child("places/" + UUID.randomUUID().toString());
+        ref.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                    currentImageUrl = uri.toString();
+                    finalSavePlace(name, note, latitude, longitude, currentImageUrl);
+                }))
+                .addOnFailureListener(e -> {
+                    Toast.makeText(AddPlaceActivity.this, R.string.msg_photo_error, Toast.LENGTH_SHORT).show();
+                    buttonSave.setEnabled(true);
+                });
+    }
+
+    private void finalSavePlace(String name, String note, double latitude, double longitude, String imageUrl) {
         String userId = mAuth.getUid();
         if (userId == null) {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
@@ -154,9 +288,10 @@ public class AddPlaceActivity extends AppCompatActivity {
         }
 
         Place place = new Place(name, note, latitude, longitude);
+        place.setTags(tags);
+        place.setImageUrl(imageUrl);
         
         if (placeId != null) {
-            // Update existing
             db.collection("users").document(userId).collection("places").document(placeId)
                     .set(place)
                     .addOnSuccessListener(aVoid -> {
@@ -164,11 +299,10 @@ public class AddPlaceActivity extends AppCompatActivity {
                         finish();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(AddPlaceActivity.this, "Error updating place: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddPlaceActivity.this, "Error updating place", Toast.LENGTH_SHORT).show();
                         buttonSave.setEnabled(true);
                     });
         } else {
-            // Add new
             db.collection("users").document(userId).collection("places")
                     .add(place)
                     .addOnSuccessListener(documentReference -> {
@@ -176,7 +310,7 @@ public class AddPlaceActivity extends AppCompatActivity {
                         finish();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(AddPlaceActivity.this, "Error saving place: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddPlaceActivity.this, "Error saving place", Toast.LENGTH_SHORT).show();
                         buttonSave.setEnabled(true);
                     });
         }
