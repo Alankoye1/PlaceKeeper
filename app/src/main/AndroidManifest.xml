@@ -36,6 +36,18 @@
             android:name=".AddPlaceActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".MapActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".LocationPickerActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBDSoAdvE1y6SjwnbQyTZCf_0wxvF0BXS4" />
+
     </application>
 
 </manifest>

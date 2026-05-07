@@ -1,18 +1,42 @@
 <resources>
     <string name="app_name">PlaceKeeper</string>
-    <string name="add_new_place">Add New Place</string>
-    <string name="place_name">Place Name *</string>
-    <string name="note_optional">Note (optional)</string>
-    <string name="latitude">Latitude *</string>
-    <string name="longitude">Longitude *</string>
-    <string name="cancel">Cancel</string>
-    <string name="save_place">Save Place</string>
-    <string name="placekeeper">PlaceKeeper</string>
-    <string name="email">Email</string>
-    <string name="password">Password</string>
-    <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
-    <string name="login">Login</string>
-    <string name="no_places_saved_yet_ntap_to_add_one">No places saved yet.\nTap + to add one!</string>
-    <string name="add_place">Add Place</string>
-    <string name="create_account">Create Account</string>
+
+    <!-- Auth -->
+    <string name="title_login">Login</string>
+    <string name="title_register">Create Account</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="link_register">Don\'t have an account? Register</string>
+    <string name="link_login">Already have an account? Login</string>
+
+    <!-- Place Management -->
+    <string name="title_add_place">Add New Place</string>
+    <string name="title_edit_place">Edit Place</string>
+    <string name="hint_place_name">Place Name *</string>
+    <string name="hint_note">Note (optional)</string>
+    <string name="hint_latitude">Latitude *</string>
+    <string name="hint_longitude">Longitude *</string>
+
+    <!-- Buttons -->
+    <string name="btn_save">Save Place</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_pick_map">Pick from Map</string>
+    <string name="btn_current_location">Use Current Location</string>
+
+    <!-- Main Screen -->
+    <string name="msg_empty_list">No places saved yet.\nTap + to add one!</string>
+    <string name="desc_add_place">Add Place</string>
+
+    <!-- Dialogs -->
+    <string name="confirm_delete_title">Delete Place</string>
+    <string name="confirm_delete_msg">Are you sure you want to delete this place?</string>
+
+    <!-- Menus -->
+    <string name="menu_logout">Logout</string>
+    <string name="menu_map">View Map</string>
+
+    <!-- Errors & Messages -->
+    <string name="error_location_permission">Location permission is required to use this feature.</string>
 </resources>

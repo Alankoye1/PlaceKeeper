@@ -53,11 +53,18 @@
             android:layout_marginTop="8dp">
 
             <Button
+                android:id="@+id/button_edit"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_edit" />
+
+            <Button
                 android:id="@+id/button_delete"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete"
+                android:text="@string/btn_delete"
                 android:textColor="@android:color/holo_red_dark" />
 
         </LinearLayout>

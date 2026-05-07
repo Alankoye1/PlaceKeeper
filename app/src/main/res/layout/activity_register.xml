@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_account"
+        android:text="@string/title_register"
         android:textSize="28sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp"/>
@@ -23,7 +23,7 @@
             android:id="@+id/edit_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
+            android:hint="@string/hint_email"
             android:inputType="textEmailAddress"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -36,7 +36,7 @@
             android:id="@+id/edit_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:hint="@string/hint_password"
             android:inputType="textPassword"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -44,14 +44,14 @@
         android:id="@+id/button_register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register"
+        android:text="@string/title_register"
         android:padding="12dp"/>
 
     <TextView
         android:id="@+id/text_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Already have an account? Login"
+        android:text="@string/link_login"
         android:layout_marginTop="16dp"
         android:textColor="?attr/colorPrimary"
         android:clickable="true"

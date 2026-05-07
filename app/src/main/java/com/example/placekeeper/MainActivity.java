@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -87,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
     @Override
     public void onDeleteClick(Place place) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete Place")
-                .setMessage("Are you sure you want to delete this place?")
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.confirm_delete_title)
+                .setMessage(R.string.confirm_delete_msg)
+                .setPositiveButton(R.string.btn_delete, (dialog, which) -> {
                     String userId = mAuth.getUid();
                     if (userId != null && place.getId() != null) {
                         db.collection("users").document(userId).collection("places").document(place.getId())
@@ -98,22 +99,55 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
                                 .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Error deleting place", Toast.LENGTH_SHORT).show());
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.btn_cancel, null)
                 .show();
+    }
+
+    @Override
+    public void onEditClick(Place place) {
+        Intent intent = new Intent(this, AddPlaceActivity.class);
+        intent.putExtra("place_id", place.getId());
+        intent.putExtra("place_name", place.getPlaceName());
+        intent.putExtra("place_note", place.getNote());
+        intent.putExtra("latitude", place.getLatitude());
+        intent.putExtra("longitude", place.getLongitude());
+        startActivity(intent);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        if (searchView != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    adapter.filter(query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    adapter.filter(newText);
+                    return false;
+                }
+            });
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_logout) {
+        int id = item.getItemId();
+        if (id == R.id.action_logout) {
             mAuth.signOut();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
+            return true;
+        } else if (id == R.id.action_map) {
+            startActivity(new Intent(MainActivity.this, MapActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

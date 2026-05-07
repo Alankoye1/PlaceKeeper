@@ -14,11 +14,13 @@ import java.util.Locale;
 
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> {
 
-    private List<Place> places = new ArrayList<>();
+    private List<Place> allPlaces = new ArrayList<>();
+    private List<Place> displayedPlaces = new ArrayList<>();
     final private OnPlaceClickListener listener;
 
     public interface OnPlaceClickListener {
         void onDeleteClick(Place place);
+        void onEditClick(Place place);
     }
 
     public PlaceAdapter(OnPlaceClickListener listener) {
@@ -26,7 +28,23 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     }
 
     public void setPlaces(List<Place> places) {
-        this.places = places;
+        this.allPlaces = places;
+        this.displayedPlaces = new ArrayList<>(places);
+        notifyDataSetChanged();
+    }
+
+    public void filter(String query) {
+        displayedPlaces.clear();
+        if (query.isEmpty()) {
+            displayedPlaces.addAll(allPlaces);
+        } else {
+            String filterPattern = query.toLowerCase().trim();
+            for (Place place : allPlaces) {
+                if (place.getPlaceName().toLowerCase().contains(filterPattern)) {
+                    displayedPlaces.add(place);
+                }
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -39,13 +57,13 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
 
     @Override
     public void onBindViewHolder(@NonNull PlaceViewHolder holder, int position) {
-        Place place = places.get(position);
+        Place place = displayedPlaces.get(position);
         holder.bind(place, listener);
     }
 
     @Override
     public int getItemCount() {
-        return places.size();
+        return displayedPlaces.size();
     }
 
     static class PlaceViewHolder extends RecyclerView.ViewHolder {
@@ -54,6 +72,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         final TextView textCoordinates;
         final TextView textDate;
         final Button buttonDelete;
+        final Button buttonEdit;
 
         public PlaceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,6 +81,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             textCoordinates = itemView.findViewById(R.id.text_place_coordinates);
             textDate = itemView.findViewById(R.id.text_place_date);
             buttonDelete = itemView.findViewById(R.id.button_delete);
+            buttonEdit = itemView.findViewById(R.id.button_edit);
         }
 
         public void bind(final Place place, final OnPlaceClickListener listener) {
@@ -79,6 +99,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             buttonDelete.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDeleteClick(place);
+                }
+            });
+
+            buttonEdit.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onEditClick(place);
                 }
             });
         }
