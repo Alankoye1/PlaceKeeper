@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "867071389776",
+    "project_id": "placekeeper-dc0e9",
+    "storage_bucket": "placekeeper-dc0e9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867071389776:android:84f74810858684e5ac6155",
+        "android_client_info": {
+          "package_name": "com.example.placekeeper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE_yXsd-GkhZ1-KHYi8THuy5C95lmRHjU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
