@@ -48,5 +48,4 @@
     <string name="msg_photo_error">Error uploading photo</string>
     <string name="title_place_details">Place Details</string>
     <string name="btn_share">Share Place</string>
-    <string name="btn_export">Export Data</string>
 </resources>

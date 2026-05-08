@@ -82,7 +82,6 @@ public class AddPlaceActivity extends AppCompatActivity {
         buttonSave = findViewById(R.id.button_save);
         Button buttonCancel = findViewById(R.id.button_cancel);
         Button buttonCurrent = findViewById(R.id.button_current_location);
-        Button buttonPick = findViewById(R.id.button_pick_map);
 
         // Edit Mode
         Intent intent = getIntent();
@@ -99,7 +98,6 @@ public class AddPlaceActivity extends AppCompatActivity {
 
         buttonSave.setOnClickListener(v -> savePlace());
         buttonCancel.setOnClickListener(v -> finish());
-        buttonPick.setOnClickListener(v -> startActivityForResult(new Intent(AddPlaceActivity.this, LocationPickerActivity.class), PICK_LOCATION_REQUEST));
         buttonCurrent.setOnClickListener(v -> checkLocationPermission());
         
         buttonAddPhoto.setOnClickListener(v -> showImagePickerDialog());
@@ -176,12 +174,7 @@ public class AddPlaceActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            if (requestCode == PICK_LOCATION_REQUEST && data != null) {
-                double lat = data.getDoubleExtra("latitude", 0.0);
-                double lng = data.getDoubleExtra("longitude", 0.0);
-                editLat.setText(String.valueOf(lat));
-                editLng.setText(String.valueOf(lng));
-            } else if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+            if (requestCode == PICK_IMAGE_REQUEST && data != null) {
                 imageUri = data.getData();
                 imagePreview.setImageURI(imageUri);
                 imagePreview.setVisibility(android.view.View.VISIBLE);
