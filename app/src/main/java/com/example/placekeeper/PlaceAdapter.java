@@ -78,7 +78,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         final Button buttonEdit;
         final ChipGroup chipGroupTags;
 
-        public PlaceViewHolder(@NonNull View itemView) {
+        PlaceViewHolder(@NonNull View itemView) {
             super(itemView);
             textName = itemView.findViewById(R.id.text_place_name);
             textNote = itemView.findViewById(R.id.text_place_note);
@@ -96,9 +96,10 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             
             if (place.getCreatedAt() != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-                textDate.setText("Added: " + sdf.format(place.getCreatedAt().toDate()));
+                String dateStr = sdf.format(place.getCreatedAt().toDate());
+                textDate.setText(itemView.getContext().getString(R.string.added_date, dateStr));
             } else {
-                textDate.setText("Added: Just now");
+                textDate.setText(itemView.getContext().getString(R.string.added_just_now));
             }
 
             chipGroupTags.removeAllViews();

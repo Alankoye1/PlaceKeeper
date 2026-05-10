@@ -79,8 +79,9 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         textCoordinates.setText(String.format(Locale.getDefault(), "Lat: %.6f, Lon: %.6f", place.getLatitude(), place.getLongitude()));
         
         if (place.getCreatedAt() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-            textDate.setText("Added: " + sdf.format(place.getCreatedAt().toDate()));
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+            String dateStr = sdf.format(place.getCreatedAt().toDate());
+            textDate.setText(getString(R.string.added_date, dateStr));
         }
 
         if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {

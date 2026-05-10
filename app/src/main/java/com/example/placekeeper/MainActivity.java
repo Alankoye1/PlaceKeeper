@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.OnPl
     private TextView textEmpty;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private List<Place> allPlacesList = new ArrayList<>();
+    private final List<Place> allPlacesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

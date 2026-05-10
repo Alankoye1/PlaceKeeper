@@ -8,6 +8,7 @@
     <string name="hint_password">Password</string>
     <string name="link_register">Don\'t have an account? Register</string>
     <string name="link_login">Already have an account? Login</string>
+    <string name="login_with_google">Login with Google</string>
 
     <!-- Place Management -->
     <string name="title_add_place">Add New Place</string>
@@ -22,7 +23,6 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_delete">Delete</string>
     <string name="btn_edit">Edit</string>
-    <string name="btn_pick_map">Pick from Map</string>
     <string name="btn_current_location">Use Current Location</string>
 
     <!-- Main Screen -->
@@ -48,4 +48,6 @@
     <string name="msg_photo_error">Error uploading photo</string>
     <string name="title_place_details">Place Details</string>
     <string name="btn_share">Share Place</string>
+    <string name="added_date">Added: %1$s</string>
+    <string name="added_just_now">Added: Just now</string>
 </resources>
